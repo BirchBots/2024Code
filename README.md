@@ -11,7 +11,7 @@ _The year we attempt SWERVE_
 ### Module Specs
 * MK4i Steering/Turn Gear Ratio: 150/7:1
 * MK4i Drive L2 Gear Ratio: 6.75:1
-* NEO Motor V1.1 Free Speed: 5820 RPM = 15.1 ft/s
+* NEO Motor V1.1 Free Speed: 5820 RPM ➡ 15.1 ft/s
 
 ### Motor Specs
 * Nominal Voltage: 12 V
