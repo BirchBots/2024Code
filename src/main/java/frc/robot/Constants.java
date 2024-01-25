@@ -20,19 +20,19 @@ public final class Constants {
     public static final double kD = 0;
 
     public static final double kDriveGearRatio = 1/6.75; //probably??
-    public static final double kTurnGearRatio = 150/7;
+    public static final double kSteerGearRatio = 150/7;
     public static final int kWheelDiameter = 4;
     
     public static final double kMaxMeterPerSec = feetToMeters(15.1); //idk how accurate this is
 
     public static final int kFlDrive = 2;
-    public static final int kFlTurn = 1;
+    public static final int kFlSteer = 1;
     public static final int kFrDrive = 4;
-    public static final int kFrTurn = 3;
+    public static final int kFrSteer = 3;
     public static final int kBlDrive = 8;
-    public static final int kBlTurn = 7;
+    public static final int kBlSteer = 7;
     public static final int kBrDrive = 5;
-    public static final int kBrTurn = 6;
+    public static final int kBrSteer = 6;
 
     public static final int kFlEncoder = 2;
     public static final int kFrEncoder = 1;
