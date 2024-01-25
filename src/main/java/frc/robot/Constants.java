@@ -23,7 +23,7 @@ public final class Constants {
     public static final double kTurnGearRatio = 150/7;
     public static final int kWheelDiameter = 4;
     
-    public static final double kMaxMeterPerSec = 4.60248; //idk how accurate this is
+    public static final double kMaxMeterPerSec = feetToMeters(15.1); //idk how accurate this is
 
     public static final int kFlDrive = 2;
     public static final int kFlTurn = 1;
