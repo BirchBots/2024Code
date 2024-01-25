@@ -19,11 +19,11 @@ public final class Constants {
     public static final double kI = 0;
     public static final double kD = 0;
 
-    public static final double kDriveGearRatio = 1/6.75; //probably??
-    public static final double kSteerGearRatio = 150/7;
+    public static final double kDriveGearRatio = 6.75; // 6.75:1
+    public static final double kSteerGearRatio = 150/7; // (150/7):1
     public static final int kWheelDiameter = 4;
     
-    public static final double kMaxMeterPerSec = feetToMeters(15.1); //idk how accurate this is
+    public static final double kMaxMeterPerSec = feetToMeters(15.1); // L2 drivetrain free speed
 
     public static final int kFlDrive = 2;
     public static final int kFlSteer = 1;
