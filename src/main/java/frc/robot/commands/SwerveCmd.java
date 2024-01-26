@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -49,10 +50,12 @@ public class SwerveCmd extends Command {
         
         ChassisSpeeds speeds;
         if (fieldOrientFunction.get()) {
-          speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-          xSpeed, ySpeed, turnSpeed, swerveSubsystem.getRot2d());
+            SmartDashboard.putBoolean("Field", false);
+            swerveSubsystem.setRot(turnSpeed);
+            speeds = new ChassisSpeeds(xSpeed, ySpeed, turnSpeed);
         } else {
-          speeds = new ChassisSpeeds(xSpeed, ySpeed, turnSpeed);
+            SmartDashboard.putBoolean("Field", true);
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turnSpeed, swerveSubsystem.getRot());
         }
         SwerveModuleState[] moduleStates = kKinematics.toSwerveModuleStates(speeds);
         swerveSubsystem.setModuleStates(moduleStates);

@@ -14,7 +14,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class SwerveSubsystem extends SubsystemBase {
   private SwerveModule flModule = new SwerveModule(kFlDrive, kFlTurn, kFlEncoder, true, true, false, kFlOffset);
@@ -22,9 +21,19 @@ public class SwerveSubsystem extends SubsystemBase {
   private SwerveModule blModule = new SwerveModule(kBlDrive, kBlTurn, kBlEncoder, true, false, false, kBlOffset);
   private SwerveModule brModule = new SwerveModule(kBrDrive, kBrTurn, kBrEncoder, true, false, false, kBrOffset);
 
+  private double rot;
+
+  public void setRot(double in) {
+    rot -= in;
+  }
+
+  public Rotation2d getRot() {
+    return Rotation2d.fromDegrees(rot);
+  }
+
   private Pigeon2 gyro = new Pigeon2(8);
 
-  public SwerveSubsystem(CommandXboxController controllerIn) {
+  public SwerveSubsystem() {
     new Thread(() -> {
       try {
         Thread.sleep(1000);
@@ -62,7 +71,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    double rotation = getHeading();
+    double rotation = rot;
     double states[] = {
       flModule.current.angle.getDegrees(),
       flModule.current.speedMetersPerSecond,
