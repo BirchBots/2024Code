@@ -85,6 +85,8 @@ public class SwerveSubsystem extends SubsystemBase {
     };
     //SmartDashboard.putNumber("Rotation", rotation);
     SmartDashboard.putNumberArray("States", states);
+    SmartDashboard.putNumber("Setpoint", flModule.current.angle.getRadians()/kMaxMeterPerSec);
+    SmartDashboard.putNumber("flPID", flModule.pid.calculate(flModule.getTurnPosition(), flModule.current.angle.getRadians()/kMaxMeterPerSec));
     super.periodic();
   }
 }

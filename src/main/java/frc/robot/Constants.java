@@ -15,7 +15,7 @@ public final class Constants {
   public static class SwerveConstants {
     public static final MotorType kBrushless = MotorType.kBrushless;
 
-    public static final double kP = 0.3; //needs tuning
+    public static final double kP = 1; //needs tuning
     public static final double kI = 0;
     public static final double kD = 0;
 
@@ -53,7 +53,8 @@ public final class Constants {
       new Translation2d(-kChassisLength/2, -kChassisWidth/2),
       new Translation2d(-kChassisLength/2, kChassisWidth/2)
     );
-    public static final double kSlewRate = 2;
+    public static final double kSlewRate = 1;
+    public static final double kTurnSlewRate = 1;
 
     public static final double kDeadZone = 0.05;
 

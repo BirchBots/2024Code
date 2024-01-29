@@ -25,7 +25,7 @@ public class SwerveCmd extends Command {
         this.fieldOrientFunction = fieldOrientFunction;
         this.xLimiter = new SlewRateLimiter(kSlewRate);
         this.yLimiter = new SlewRateLimiter(kSlewRate);
-        this.turnLimiter = new SlewRateLimiter(kSlewRate);
+        this.turnLimiter = new SlewRateLimiter(kTurnSlewRate);
         addRequirements(swerveSubsystem);
     }
 

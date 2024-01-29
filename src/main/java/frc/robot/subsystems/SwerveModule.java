@@ -16,7 +16,7 @@ class SwerveModule {
     private CANSparkMax driveMotor, turnMotor;
     private RelativeEncoder driveEncoder, turnEncoder;
     private AnalogEncoder absoluteEncoder;
-    private PIDController pid;
+    PIDController pid;
     private double offsetRad;
     private boolean absoluteReversed;
     SwerveModuleState current = new SwerveModuleState();
@@ -39,6 +39,10 @@ class SwerveModule {
       resetEncoders();
       this.absoluteReversed = absoluteReversed;
       this.offsetRad = offsetRad;
+    }
+
+    public PIDController getPidController() {
+      return pid;
     }
   
     public CANSparkMax getDriveMotor() {
@@ -82,8 +86,7 @@ class SwerveModule {
       }
       current = SwerveModuleState.optimize(state, getState().angle);
       driveMotor.set(current.speedMetersPerSecond/kMaxMeterPerSec);
-      //turnMotor.set(pid.calculate(getTurnPosition(), current.angle.getRadians()));
-      turnMotor.set(current.angle.getRadians());
+      turnMotor.set(pid.calculate(getTurnPosition(), current.angle.getRadians()/kMaxMeterPerSec));
     }
     
     public void stop() {
