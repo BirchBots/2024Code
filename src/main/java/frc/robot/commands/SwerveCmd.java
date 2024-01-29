@@ -49,14 +49,14 @@ public class SwerveCmd extends Command {
         turnSpeed = turnLimiter.calculate(turnSpeed)*kMaxMeterPerSec;
         
         ChassisSpeeds speeds;
-        if (fieldOrientFunction.get()) {
+        //if (fieldOrientFunction.get()) {
             SmartDashboard.putBoolean("Field", false);
-            swerveSubsystem.setRot(turnSpeed);
+            //swerveSubsystem.setRot(turnSpeed);
             speeds = new ChassisSpeeds(xSpeed, ySpeed, turnSpeed);
-        } else {
-            SmartDashboard.putBoolean("Field", true);
+        //} else {
+            /*SmartDashboard.putBoolean("Field", true);
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turnSpeed, swerveSubsystem.getRot());
-        }
+        }*/
         SwerveModuleState[] moduleStates = kKinematics.toSwerveModuleStates(speeds);
         swerveSubsystem.setModuleStates(moduleStates);
     }

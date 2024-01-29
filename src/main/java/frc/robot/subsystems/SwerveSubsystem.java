@@ -21,7 +21,8 @@ public class SwerveSubsystem extends SubsystemBase {
   private SwerveModule blModule = new SwerveModule(kBlDrive, kBlTurn, kBlEncoder, true, false, false, kBlOffset);
   private SwerveModule brModule = new SwerveModule(kBrDrive, kBrTurn, kBrEncoder, true, false, false, kBrOffset);
 
-  private double rot;
+
+  /*private double rot;
 
   public void setRot(double in) {
     rot -= in;
@@ -31,18 +32,18 @@ public class SwerveSubsystem extends SubsystemBase {
     return Rotation2d.fromDegrees(rot);
   }
 
-  private Pigeon2 gyro = new Pigeon2(8);
+  private Pigeon2 gyro = new Pigeon2(8); */
 
   public SwerveSubsystem() {
-    new Thread(() -> {
+    /*new Thread(() -> {
       try {
         Thread.sleep(1000);
         resetHeading();
       } catch (Exception e) {}}
-    ).start();
+    ).start();*/
   }
 
-  public void resetHeading() {
+  /*public void resetHeading() {
     gyro.reset();
   }
 
@@ -52,7 +53,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public Rotation2d getRot2d() {
     return Rotation2d.fromDegrees(getHeading());
-  }
+  }*/
 
   public void stopModules() {
     flModule.stop();
@@ -71,18 +72,18 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    double rotation = rot;
+    //double rotation = rot;
     double states[] = {
-      flModule.current.angle.getDegrees(),
+      flModule.current.angle.getRadians(),
       flModule.current.speedMetersPerSecond,
-      frModule.current.angle.getDegrees(),
+      frModule.current.angle.getRadians(),
       frModule.current.speedMetersPerSecond,
-      blModule.current.angle.getDegrees(),
+      brModule.current.angle.getRadians(),
       blModule.current.speedMetersPerSecond,
-      brModule.current.angle.getDegrees(),
+      blModule.current.angle.getRadians(),
       brModule.current.speedMetersPerSecond
     };
-    SmartDashboard.putNumber("Rotation", rotation);
+    //SmartDashboard.putNumber("Rotation", rotation);
     SmartDashboard.putNumberArray("States", states);
     super.periodic();
   }
