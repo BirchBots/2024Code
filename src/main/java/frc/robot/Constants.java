@@ -16,14 +16,15 @@ public final class Constants {
     public static final MotorType kBrushless = MotorType.kBrushless;
 
     public static final double kP = 1; //needs tuning
-    public static final double kI = 0;
-    public static final double kD = 0;
+    public static final double kI = 0.1;
+    public static final double kD = 1;
 
     public static final double kDriveGearRatio = 6.75;
     public static final double kTurnGearRatio = 150/7;
     public static final int kWheelDiameter = 4;
     
-    public static final double kMaxMeterPerSec = feetToMeters(5) ; // 15.1 L2 drivetrain free speed
+    public static final double kMaxMeterPerSec = feetToMeters(15.1) ; // 15.1 L2 drivetrain free speed
+    public static final double kRadToMotor = 1.570796;
 
     public static final int kFlDrive = 2;
     public static final int kFlTurn = 1;
@@ -54,12 +55,7 @@ public final class Constants {
       new Translation2d(-kChassisLength/2, kChassisWidth/2)
     );
     public static final double kSlewRate = 1;
-    public static final double kTurnSlewRate = 1;
-
-    public static final double kDeadZone = 0.05;
-
-    public static final int kXAxis = 1;
-    public static final int kYAxis = 2;
-    public static final int kRelativeButton = 1;
+    public static final double kTurnSlewRate = 2;
+    public static final double kDeadZone = 0.1;
   }
 }

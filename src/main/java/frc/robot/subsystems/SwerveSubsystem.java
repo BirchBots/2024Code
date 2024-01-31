@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.math.util.Units.*;
 import static frc.robot.Constants.SwerveConstants.*;
 import static java.lang.Math.*;
 
@@ -73,20 +74,5 @@ public class SwerveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     //double rotation = rot;
-    double states[] = {
-      flModule.current.angle.getRadians(),
-      flModule.current.speedMetersPerSecond,
-      frModule.current.angle.getRadians(),
-      frModule.current.speedMetersPerSecond,
-      brModule.current.angle.getRadians(),
-      blModule.current.speedMetersPerSecond,
-      blModule.current.angle.getRadians(),
-      brModule.current.speedMetersPerSecond
-    };
-    //SmartDashboard.putNumber("Rotation", rotation);
-    SmartDashboard.putNumberArray("States", states);
-    SmartDashboard.putNumber("Setpoint", flModule.current.angle.getRadians()/kMaxMeterPerSec);
-    SmartDashboard.putNumber("flPID", flModule.pid.calculate(flModule.getTurnPosition(), flModule.current.angle.getRadians()/kMaxMeterPerSec));
-    super.periodic();
   }
 }

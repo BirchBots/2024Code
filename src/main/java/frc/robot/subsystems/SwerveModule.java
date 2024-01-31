@@ -13,7 +13,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 
 class SwerveModule {
-    private CANSparkMax driveMotor, turnMotor;
+    CANSparkMax driveMotor;
+    private CANSparkMax turnMotor;
     private RelativeEncoder driveEncoder, turnEncoder;
     private AnalogEncoder absoluteEncoder;
     PIDController pid;
@@ -40,6 +41,8 @@ class SwerveModule {
       this.absoluteReversed = absoluteReversed;
       this.offsetRad = offsetRad;
     }
+
+    private double testAng;
 
     public PIDController getPidController() {
       return pid;
@@ -84,9 +87,9 @@ class SwerveModule {
         stop();
         return;
       }
-      current = SwerveModuleState.optimize(state, getState().angle);
+      current = state;
       driveMotor.set(current.speedMetersPerSecond/kMaxMeterPerSec);
-      turnMotor.set(pid.calculate(getTurnPosition(), current.angle.getRadians()/kMaxMeterPerSec));
+      turnMotor.set(pid.calculate(getTurnPosition(), current.angle.getRadians()/kMaxMeterPerSec/kRadToMotor)/90*PI);
     }
     
     public void stop() {
