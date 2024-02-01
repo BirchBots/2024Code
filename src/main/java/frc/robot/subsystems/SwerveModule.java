@@ -19,67 +19,50 @@ class SwerveModule {
     private AnalogEncoder absoluteEncoder;
     PIDController pid;
     private double offsetRad;
-    private boolean absoluteReversed;
     SwerveModuleState current = new SwerveModuleState();
+    double pidOut;
   
-    SwerveModule(int driveId, int turnId, int encoderId, boolean driveReversed, boolean turnReversed, boolean absoluteReversed, double offsetRad) {
+    SwerveModule(int driveId, int turnId, int encoderId, double offsetRad) {
       driveMotor = new CANSparkMax(driveId, kBrushless);
       driveEncoder = driveMotor.getEncoder();
-      driveMotor.setInverted(driveReversed);
       driveEncoder.setPositionConversionFactor(kDriveGearRatio*PI*inchesToMeters(kWheelDiameter));
       driveEncoder.setVelocityConversionFactor(driveEncoder.getPositionConversionFactor()/60);
+
       turnMotor = new CANSparkMax(turnId, kBrushless);
-      turnMotor.setInverted(turnReversed);
       turnEncoder = turnMotor.getEncoder();
       turnEncoder.setPositionConversionFactor(kTurnGearRatio*2*PI);
       turnEncoder.setVelocityConversionFactor(turnEncoder.getPositionConversionFactor()/60);
+
       absoluteEncoder = new AnalogEncoder(encoderId);
       absoluteEncoder.setDistancePerRotation(1);
+
       pid = new PIDController(kP, kI, kD);
-      pid.enableContinuousInput(-PI, PI);
-      resetEncoders();
-      this.absoluteReversed = absoluteReversed;
+
+      pidOut = 0;
       this.offsetRad = offsetRad;
-    }
 
-    private double testAng;
-
-    public PIDController getPidController() {
-      return pid;
-    }
-  
-    public CANSparkMax getDriveMotor() {
-      return driveMotor;
-    }
-  
-    public CANSparkMax getTurnMotor() {
-      return turnMotor;
+      resetEncoders();
     }
   
     public double getTurnPosition() {
-      return turnEncoder.getPosition();
+      return turnEncoder.getPosition() % (2 * PI);
     }
   
     public double getDriveVelocity() {
       return driveEncoder.getVelocity();
     }
   
-    public double getTurnVelocity() {
-      return turnEncoder.getVelocity();
-    }
-  
     public double getAbsoluteEncoderRad() {
-      double angle = 2*PI*absoluteEncoder.getDistance() - this.offsetRad;
-      return angle * (absoluteReversed ? -1 : 1);
+      return 2*PI*absoluteEncoder.getDistance() - this.offsetRad;
     }
   
     public void resetEncoders() {
       driveEncoder.setPosition(0);
-      turnEncoder.setPosition(absoluteEncoder.getDistance());
+      turnEncoder.setPosition(0);
     }
   
     public SwerveModuleState getState() {
-      return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getTurnPosition()));
+      return current;
     }
   
     public void setState(SwerveModuleState state) {
@@ -88,8 +71,10 @@ class SwerveModule {
         return;
       }
       current = state;
+      SwerveModuleState.optimize(state, current.angle);
       driveMotor.set(current.speedMetersPerSecond/kMaxMeterPerSec);
-      turnMotor.set(pid.calculate(getTurnPosition(), current.angle.getRadians()/kMaxMeterPerSec/kRadToMotor)/90*PI);
+      pidOut = degreesToRadians(pid.calculate(getTurnPosition(), current.angle.getRadians()/2))/(2*PI);
+      turnMotor.set(pidOut > 2*PI ? -pidOut - PI : pidOut);
     }
     
     public void stop() {

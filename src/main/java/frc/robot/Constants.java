@@ -23,7 +23,7 @@ public final class Constants {
     public static final double kTurnGearRatio = 150/7;
     public static final int kWheelDiameter = 4;
     
-    public static final double kMaxMeterPerSec = feetToMeters(15.1) ; // 15.1 L2 drivetrain free speed
+    public static final double kMaxMeterPerSec = feetToMeters(5) ; // 15.1 L2 drivetrain free speed
     public static final double kRadToMotor = 1.570796;
 
     public static final int kFlDrive = 2;
