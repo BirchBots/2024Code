@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -24,7 +25,7 @@ public class SwerveCmd extends Command {
         this.fieldOrientFunction = fieldOrientFunction;
         this.xLimiter = new SlewRateLimiter(kSlewRate);
         this.yLimiter = new SlewRateLimiter(kSlewRate);
-        this.turnLimiter = new SlewRateLimiter(kSlewRate);
+        this.turnLimiter = new SlewRateLimiter(kTurnSlewRate);
         addRequirements(swerveSubsystem);
     }
 
@@ -46,14 +47,16 @@ public class SwerveCmd extends Command {
         xSpeed = xLimiter.calculate(xSpeed)*kMaxMeterPerSec;
         ySpeed = yLimiter.calculate(ySpeed)*kMaxMeterPerSec;
         turnSpeed = turnLimiter.calculate(turnSpeed)*kMaxMeterPerSec;
-        
+
         ChassisSpeeds speeds;
-        if (fieldOrientFunction.get()) {
-          speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-          xSpeed, ySpeed, turnSpeed, swerveSubsystem.getRot2d());
-        } else {
-          speeds = new ChassisSpeeds(xSpeed, ySpeed, turnSpeed);
-        }
+        //if (fieldOrientFunction.get()) {
+            SmartDashboard.putBoolean("Field", false);
+            //swerveSubsystem.setRot(turnSpeed);
+            speeds = new ChassisSpeeds(xSpeed, ySpeed, turnSpeed);
+        //} else {
+            /*SmartDashboard.putBoolean("Field", true);
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turnSpeed, swerveSubsystem.getRot());
+        }*/
         SwerveModuleState[] moduleStates = kKinematics.toSwerveModuleStates(speeds);
         swerveSubsystem.setModuleStates(moduleStates);
     }
