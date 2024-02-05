@@ -5,13 +5,19 @@ import static frc.robot.Constants.SwerveConstants.*;
 import static java.lang.Math.*;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
+import com.revrobotics.SparkPIDController;
 
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.PIDController; // not in REV code
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.AnalogEncoder;
+import edu.wpi.first.wpilibj.AnalogEncoder; // not in REV code
 
+// TODO: Compare to REV Ion 2024 code & make it work with our SDS MK4i modules
 class SwerveModule {
     CANSparkMax driveMotor;
     private CANSparkMax turnMotor;
