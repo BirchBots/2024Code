@@ -16,24 +16,31 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import frc.lib.PIDGains;
 
 public final class Constants {
+
   public static class SwerveConstants {
     
     public static final MotorType kBrushless = MotorType.kBrushless;
+    public static final boolean kGyroReversed = false; // added from REV code
+    public static final double kDeadZone = 0.05; // updated to match REV (kDriveDeadband)
 
-    // MK4i Module Constants
-    public static final double kDriveGearRatio = 6.75;
-    public static final double kTurnGearRatio = 150/7;
-    public static final int kWheelDiameter = 4; // inches
+    // Driving Parameters (NOTE: these are not the maximum capable speeds of
+    // the robot, rather the allowed maximum speeds) 
+    public static final double kMaxSpeedMetersPerSecond = 4.8;
+    public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+    public static final double kSlewRate = 1.8; // updated to match REV
+    public static final double kTurnSlewRate = 2.0; // updated to match REV
 
-    // TODO: Check this section against REV code
+    // TODO: Compare this section to REV code
     public static final double kFreeSpeedRpm = 5676; // NEO motor free speed
     public static final double kMaxMeterPerSec = feetToMeters(5) ; // 15.1 L2 drivetrain free speed
     public static final double kRadToMotor = 1.570796; // what is this?
-    public static final double kSlewRate = 1.8; // updated to match REV
-    public static final double kTurnSlewRate = 2.0; // updated to match REV
-    public static final double kDeadZone = 0.05; // updated to match REV (kDriveDeadband)
 
-    // PID Constants (NOTE: REV code has different #s for driving & turning)
+    // SDS MK4i Module Constants
+    public static final double kDriveGearRatio = 6.75;
+    public static final double kTurnGearRatio = 150/7;
+    public static final int kWheelDiameter = 4; // meters
+
+    // PID Constants (NOTE: REV code uses different #s for driving & turning)
     public static final double kP = 0.04; // updated to match REV
     public static final double kI = 0; // updated to match REV
     public static final double kD = 0; // updated to match REV
