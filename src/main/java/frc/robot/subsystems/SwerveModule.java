@@ -23,34 +23,43 @@ class SwerveModule {
     double pidOut;
   
     SwerveModule(int driveId, int turnId, int encoderId, double offsetRad) {
+      
       driveMotor = new CANSparkMax(driveId, kBrushless);
       driveEncoder = driveMotor.getEncoder();
-      driveEncoder.setPositionConversionFactor(kDriveGearRatio*PI*inchesToMeters(kWheelDiameter));
-      driveEncoder.setVelocityConversionFactor(driveEncoder.getPositionConversionFactor()/60);
+      //driveMotor.restoreFactoryDefaults(); // included in REV code
+      driveEncoder.setPositionConversionFactor((PI*kWheelDiameter)) / kMotorReduction); // meters
+      driveEncoder.setVelocityConversionFactor(driveEncoder.getPositionConversionFactor()/60); // radians per second
 
       turnMotor = new CANSparkMax(turnId, kBrushless);
-      turnEncoder = turnMotor.getEncoder();
-      turnEncoder.setPositionConversionFactor(kTurnGearRatio*2*PI);
-      turnEncoder.setVelocityConversionFactor(turnEncoder.getPositionConversionFactor()/60);
+      turnEncoder = turnMotor.getEncoder(); // REV uses turnEncoder.getAbsoluteEncoder(Type.kDutyCycle)
+      //turnMotor.restoreFactoryDefaults(); // included in REV code
+      turnEncoder.setPositionConversionFactor(2*PI); // radians
+      turnEncoder.setVelocityConversionFactor(turnEncoder.getPositionConversionFactor()/60); // radians per second
 
+      // what is this section for?
       absoluteEncoder = new AnalogEncoder(encoderId);
       absoluteEncoder.setDistancePerRotation(1);
 
+      // Why do we only get turnMotorPID? REV has driveMotorPID too
       pid = turnMotor.getPIDController();
       pid.setFeedbackDevice(turnEncoder);
-      pid.setPositionPIDWrappingEnabled(true);
-      pid.setPositionPIDWrappingMinInput(kPidMin);
-      pid.setPositionPIDWrappingMaxInput(kPidMax);
-      pid.setP(kP);
-      pid.setI(kI);
-      pid.setD(kD);
-      pid.setFF(kFF);
+      pid.setPositionPIDWrappingEnabled(true); 
+      pid.setPositionPIDWrappingMinInput(kPidMin); 
+      pid.setPositionPIDWrappingMaxInput(kPidMax); 
+      pid.setP(kP); // REV has 0.4 for drivePID & 1 for turnPID
+      pid.setI(kI); // likely 0 for both drivePID & turnPID
+      pid.setD(kD); // likely 0 for both drivePID & turnPID
+      pid.setFF(kFF); // kFF is different for drivePID & turnPID
       pid.setOutputRange(kPidMin, kPidMax);
 
-      pidOut = 0;
-      this.offsetRad = offsetRad;
+      // below adapted from REV code
+      driveMotor.setSmartCurrentLimit(50); // amps
+      turnMotor.setSmartCurrentLimit(20); // amps
 
-      resetEncoders();
+      pidOut = 0; // remove??
+      this.offsetRad = offsetRad; 
+      //this.desiredState.angle = new Rotation2d(turnEncoder.getPosition()); // included in REV code
+      resetEncoders(); // REV only has driveEncoder.setPosition(0);
     }
   
     public double getTurnPosition() {
@@ -66,8 +75,8 @@ class SwerveModule {
     }
   
     public void resetEncoders() {
-      driveEncoder.setPosition(0);
-      turnEncoder.setPosition(0);
+      driveEncoder.setPosition(0); 
+      turnEncoder.setPosition(0); 
     }
   
     public SwerveModuleState getState() {
