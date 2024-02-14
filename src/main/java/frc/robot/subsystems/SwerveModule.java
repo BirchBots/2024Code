@@ -5,25 +5,19 @@ import static frc.robot.Constants.SwerveConstants.*;
 import static java.lang.Math.*;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.SparkPIDController;
 
-import edu.wpi.first.math.controller.PIDController; // not in REV code
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.AnalogEncoder; // not in REV code
 
-// TODO: Compare to REV Ion 2024 code & make it work with our SDS MK4i modules
 class SwerveModule {
     CANSparkMax driveMotor;
     private CANSparkMax turnMotor;
     private RelativeEncoder driveEncoder, turnEncoder;
     private AnalogEncoder absoluteEncoder;
-    PIDController pid;
+    private SparkPIDController pid;
     private double offsetRad;
     SwerveModuleState current = new SwerveModuleState();
     double pidOut;
@@ -42,7 +36,16 @@ class SwerveModule {
       absoluteEncoder = new AnalogEncoder(encoderId);
       absoluteEncoder.setDistancePerRotation(1);
 
-      pid = new PIDController(kP, kI, kD);
+      pid = turnMotor.getPIDController();
+      pid.setFeedbackDevice(turnEncoder);
+      pid.setPositionPIDWrappingEnabled(true);
+      pid.setPositionPIDWrappingMinInput(kPidMin);
+      pid.setPositionPIDWrappingMaxInput(kPidMax);
+      pid.setP(kP);
+      pid.setI(kI);
+      pid.setD(kD);
+      pid.setFF(kFF);
+      pid.setOutputRange(kPidMin, kPidMax);
 
       pidOut = 0;
       this.offsetRad = offsetRad;
@@ -74,13 +77,11 @@ class SwerveModule {
     public void setState(SwerveModuleState state) {
       if (abs(state.speedMetersPerSecond) < 0.001) {
         stop();
-        return;
+      } else {
+        current = SwerveModuleState.optimize(state, new Rotation2d(getTurnPosition()));
+        driveMotor.set(current.speedMetersPerSecond/kMaxMeterPerSec);
+        //set turnMotor here
       }
-      current = state;
-      SwerveModuleState.optimize(state, current.angle);
-      driveMotor.set(current.speedMetersPerSecond/kMaxMeterPerSec);
-      pidOut = degreesToRadians(pid.calculate(getTurnPosition(), current.angle.getRadians()/2))/(2*PI);
-      turnMotor.set(pidOut > 2*PI ? -pidOut - PI : pidOut);
     }
     
     public void stop() {
