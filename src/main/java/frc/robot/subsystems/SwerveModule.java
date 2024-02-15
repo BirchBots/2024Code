@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.SwerveConstants.*;
 import static java.lang.Math.*;
 
+
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
@@ -25,6 +26,7 @@ class SwerveModule {
       driveMotor = new CANSparkMax(driveId, kBrushless);
       driveMotor.burnFlash();
       driveEncoder = driveMotor.getEncoder();
+
       driveEncoder.setPositionConversionFactor(PI*kWheelDiameter/kMotorReduction);
       driveEncoder.setVelocityConversionFactor(driveEncoder.getPositionConversionFactor()/60);
 
