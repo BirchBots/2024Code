@@ -1,90 +1,110 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.math.util.Units.*;
-import static frc.robot.Constants.SwerveConstants.*;
-import static java.lang.Math.*;
-
-import com.revrobotics.CANSparkMax;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.SparkPIDController;
-
-import edu.wpi.first.math.controller.PIDController; // not in REV code
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.AnalogEncoder; // not in REV code
+import static frc.robot.Constants.ModuleConstants.*;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.AnalogEncoder;
 
-// TODO: Compare to REV Ion 2024 code & make it work with our SDS MK4i modules
-class SwerveModule {
-    CANSparkMax driveMotor;
-    private CANSparkMax turnMotor;
-    private RelativeEncoder driveEncoder, turnEncoder;
-    private AnalogEncoder absoluteEncoder;
-    PIDController pid;
-    private double offsetRad;
-    SwerveModuleState current = new SwerveModuleState();
-    double pidOut;
-  
-    SwerveModule(int driveId, int turnId, int encoderId, double offsetRad) {
-      driveMotor = new CANSparkMax(driveId, kBrushless);
-      driveEncoder = driveMotor.getEncoder();
-      driveEncoder.setPositionConversionFactor(kDriveGearRatio*PI*inchesToMeters(kWheelDiameter));
-      driveEncoder.setVelocityConversionFactor(driveEncoder.getPositionConversionFactor()/60);
+public class SwerveModule {
+  private final CANSparkMax m_drivingSparkMax;
+  private final CANSparkMax m_turningSparkMax;
 
-      turnMotor = new CANSparkMax(turnId, kBrushless);
-      turnEncoder = turnMotor.getEncoder();
-      turnEncoder.setPositionConversionFactor(kTurnGearRatio*2*PI);
-      turnEncoder.setVelocityConversionFactor(turnEncoder.getPositionConversionFactor()/60);
+  private final RelativeEncoder m_drivingEncoder;
 
-      absoluteEncoder = new AnalogEncoder(encoderId);
-      absoluteEncoder.setDistancePerRotation(1);
+  private final AnalogEncoder m_turningEncoder;
+  private final AnalogInput m_turningEncoderInput;
 
-      pid = new PIDController(kP, kI, kD);
+  private final SparkPIDController m_drivingPIDController;
+  private final SparkPIDController m_turningPIDController;
 
-      pidOut = 0;
-      this.offsetRad = offsetRad;
+  private double m_chassisAngularOffset = 0;
+  SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
-      resetEncoders();
-    }
-  
-    public double getTurnPosition() {
-      return turnEncoder.getPosition() % (2 * PI);
-    }
-  
-    public double getDriveVelocity() {
-      return driveEncoder.getVelocity();
-    }
-  
-    public double getAbsoluteEncoderRad() {
-      return 2*PI*absoluteEncoder.getDistance() - this.offsetRad;
-    }
-  
-    public void resetEncoders() {
-      driveEncoder.setPosition(0);
-      turnEncoder.setPosition(0);
-    }
-  
-    public SwerveModuleState getState() {
-      return current;
-    }
-  
-    public void setState(SwerveModuleState state) {
-      if (abs(state.speedMetersPerSecond) < 0.001) {
-        stop();
-        return;
-      }
-      current = state;
-      SwerveModuleState.optimize(state, current.angle);
-      driveMotor.set(current.speedMetersPerSecond/kMaxMeterPerSec);
-      pidOut = degreesToRadians(pid.calculate(getTurnPosition(), current.angle.getRadians()/2))/(2*PI);
-      turnMotor.set(pidOut > 2*PI ? -pidOut - PI : pidOut);
-    }
-    
-    public void stop() {
-      driveMotor.set(0);
-      turnMotor.set(0);
-    }
+  public SwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset, int encoderId) {
+    m_drivingSparkMax = new CANSparkMax(drivingCANId, MotorType.kBrushless);
+    m_turningSparkMax = new CANSparkMax(turningCANId, MotorType.kBrushless);
+
+    m_drivingSparkMax.restoreFactoryDefaults();
+    m_turningSparkMax.restoreFactoryDefaults();
+
+    m_drivingEncoder = m_drivingSparkMax.getEncoder();
+    m_turningEncoderInput = new AnalogInput(encoderId); 
+    m_turningEncoder = new AnalogEncoder(m_turningEncoderInput);
+    m_drivingPIDController = m_drivingSparkMax.getPIDController();
+    m_drivingPIDController.setFeedbackDevice(m_drivingEncoder);
+    m_turningPIDController = m_turningSparkMax.getPIDController();
+
+    m_drivingEncoder.setPositionConversionFactor(kDrivingEncoderPositionFactor);
+    m_drivingEncoder.setVelocityConversionFactor(kDrivingEncoderVelocityFactor);
+
+    m_drivingPIDController.setPositionPIDWrappingEnabled(true);
+    m_drivingPIDController.setPositionPIDWrappingMinInput(kTurningEncoderPositionPIDMinInput);
+    m_drivingPIDController.setPositionPIDWrappingMaxInput(kTurningEncoderPositionPIDMaxInput);
+
+    m_turningPIDController.setPositionPIDWrappingEnabled(true);
+    m_turningPIDController.setPositionPIDWrappingMinInput(kTurningEncoderPositionPIDMinInput);
+    m_turningPIDController.setPositionPIDWrappingMaxInput(kTurningEncoderPositionPIDMaxInput);
+
+    m_drivingPIDController.setP(kDrivingP);
+		m_drivingPIDController.setI(kDrivingI);
+		m_drivingPIDController.setD(kDrivingD);
+		m_drivingPIDController.setFF(kDrivingFF);
+		m_drivingPIDController.setOutputRange(kDrivingMinOutput, kDrivingMaxOutput);
+
+    m_turningPIDController.setP(kTurningP);
+    m_turningPIDController.setI(kTurningI);
+    m_turningPIDController.setD(kTurningD);
+    m_turningPIDController.setFF(kTurningFF);
+    m_turningPIDController.setOutputRange(kTurningMinOutput, kTurningMaxOutput);
+
+    m_drivingSparkMax.setIdleMode(kDrivingMotorIdleMode);
+    m_turningSparkMax.setIdleMode(kTurningMotorIdleMode);
+    m_drivingSparkMax.setSmartCurrentLimit(kDrivingMotorCurrentLimit);
+    m_turningSparkMax.setSmartCurrentLimit(kTurningMotorCurrentLimit);
+
+    m_drivingSparkMax.burnFlash();
+    m_turningSparkMax.burnFlash();
+
+    m_chassisAngularOffset = chassisAngularOffset;
+    m_desiredState.angle = new Rotation2d(m_turningEncoder.get());
+    m_drivingEncoder.setPosition(0);
   }
+
+  public SwerveModuleState getState() {
+    return new SwerveModuleState(
+        m_drivingEncoder.getVelocity(),
+        new Rotation2d(Math.toRadians(m_turningEncoder.get() * 360) - m_chassisAngularOffset));
+  }
+
+  public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition(
+        m_drivingEncoder.getPosition(),
+        new Rotation2d(Math.toRadians(m_turningEncoder.get() * 360) - m_chassisAngularOffset));
+  }
+
+  public void setDesiredState(SwerveModuleState desiredState) {
+    desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset));
+    desiredState = SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.get()));
+
+    m_drivingPIDController.setReference(desiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
+    m_turningPIDController.setReference(desiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
+
+    SmartDashboard.putNumber("Speed", desiredState.speedMetersPerSecond);
+
+    m_desiredState = desiredState;
+  }
+
+  public void resetEncoders() {
+    m_drivingEncoder.setPosition(0);
+  }
+}

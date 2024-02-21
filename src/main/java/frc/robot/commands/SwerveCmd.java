@@ -14,7 +14,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class SwerveCmd extends Command {
     private SwerveSubsystem swerveSubsystem;
     private Supplier<Double> xSpdFunction, ySpdFunction, turnSpdFunction;
-    private Supplier<Boolean> fieldOrientFunction;
+    //private Supplier<Boolean> fieldOrientFunction;
     private SlewRateLimiter xLimiter, yLimiter, turnLimiter;
 
     public SwerveCmd(SwerveSubsystem swerveSubsystem, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turnSpdFunction, Supplier<Boolean> fieldOrientFunction) {
@@ -22,7 +22,7 @@ public class SwerveCmd extends Command {
         this.xSpdFunction = xSpdFunction;
         this.ySpdFunction = ySpdFunction;
         this.turnSpdFunction = turnSpdFunction;
-        this.fieldOrientFunction = fieldOrientFunction;
+        //this.fieldOrientFunction = fieldOrientFunction;
         this.xLimiter = new SlewRateLimiter(kSlewRate);
         this.yLimiter = new SlewRateLimiter(kSlewRate);
         this.turnLimiter = new SlewRateLimiter(kTurnSlewRate);
@@ -33,6 +33,7 @@ public class SwerveCmd extends Command {
     public void initialize() {
         super.initialize();
     }
+    
 
     @Override
     public void execute() {
